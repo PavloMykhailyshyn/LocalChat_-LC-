@@ -59,7 +59,6 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
                 if (!std::regex_match(recipient_name, letters_and_numbers))
                 {
                     R_iNCORRECT();
-                    return false;
                 }
                 recipient = recipient_name;
             }
@@ -70,7 +69,6 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
                 if (!std::regex_match(msg, ASCII))
                 {
                     M_iNCORRECT();
-                    return false;
                 }
                 message = msg;
             }
