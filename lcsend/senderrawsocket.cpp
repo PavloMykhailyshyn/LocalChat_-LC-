@@ -2,7 +2,7 @@
 namespace rawsocket
 {
 
-const std::string senderrawsocket::localhost_ = LOCALHOST;
+const std::string senderrawsocket::ip_ = SOURCE_ADDR;
 const std::uint32_t senderrawsocket::port_ = PORT;
 
 senderrawsocket::senderrawsocket(std::string recipient, std::string message)
@@ -31,10 +31,10 @@ senderrawsocket::senderrawsocket(std::string recipient, std::string message)
     strcpy(data_, recipient_and_message.c_str());
 
     //some address resolution
-    strcpy(source_ip_, localhost_.c_str());
+    strcpy(source_ip_, ip_.c_str());
     sin_.sin_family = AF_INET;
     sin_.sin_port = htons(port_);
-    sin_.sin_addr.s_addr = inet_addr(DEFAULT_ADDR);
+    sin_.sin_addr.s_addr = inet_addr(DESTINATION_ADDR);
 
     IPheader();
     IPchecksum();
