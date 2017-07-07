@@ -7,7 +7,7 @@ namespace rawsocket
 {
 class senderrawsocket
 {
-    static const std::string localhost_;
+    static const std::string ip_;
     static const std::uint32_t port_;
 
     std::int32_t raw_socket_;
