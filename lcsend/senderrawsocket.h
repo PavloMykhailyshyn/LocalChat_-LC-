@@ -7,8 +7,9 @@ namespace rawsocket
 {
 class senderrawsocket
 {
-    static const std::string ip_;
+    std::string ip_;
     static const std::uint32_t port_;
+    bool localhost_flag_;
 
     std::int32_t raw_socket_;
 
@@ -34,10 +35,10 @@ class senderrawsocket
     unsigned short csum(unsigned short * ptr, std::int32_t nbytes);
 
 public:
-    senderrawsocket(std::string, std::string);
+    senderrawsocket(std::string, std::string, bool = false);
     senderrawsocket(const senderrawsocket&)                 = delete;
     senderrawsocket operator = (const senderrawsocket&)     = delete;
-    ~senderrawsocket()                                      = default;
+    ~senderrawsocket();
 
     void SendTo();
 };

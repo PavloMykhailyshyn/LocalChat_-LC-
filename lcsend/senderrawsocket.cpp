@@ -2,12 +2,41 @@
 namespace rawsocket
 {
 
-const std::string senderrawsocket::ip_ = SOURCE_ADDR;
 const std::uint32_t senderrawsocket::port_ = PORT;
 
-senderrawsocket::senderrawsocket(std::string recipient, std::string message)
+senderrawsocket::senderrawsocket(std::string recipient, std::string message, bool localhost_flag) : localhost_flag_(localhost_flag)
 {
     std::string recipient_and_message = recipient + DELIMITER + message;
+
+    if (localhost_flag_)
+    {
+        ip_ = LOCALHOST_SOURCE_ADDR;
+    }
+    else
+    {
+        ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
+        void * tmpAddrPtr = NULL;
+
+        getifaddrs(&ifAddrStruct);
+        for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+        {
+            if (ifa ->ifa_addr->sa_family == AF_INET) // Check it is IPv4
+            {
+                char mask[INET_ADDRSTRLEN];
+                void* mask_ptr = &((sockaddr_in*) ifa->ifa_netmask)->sin_addr;
+                inet_ntop(AF_INET, mask_ptr, mask, INET_ADDRSTRLEN);
+                if (strcmp(mask, MASK) != 0) // Is a valid IPv4 Address
+                {
+                    tmpAddrPtr = &((sockaddr_in *) ifa->ifa_addr)->sin_addr;
+                    char addressBuffer[INET_ADDRSTRLEN];
+                    inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+                    ip_ = addressBuffer;
+                }
+            }
+        }
+        if (ifAddrStruct != NULL)
+            freeifaddrs(ifAddrStruct);
+    }
 
     raw_socket_ = socket (PF_INET, SOCK_RAW, IPPROTO_TCP);
 
@@ -34,7 +63,14 @@ senderrawsocket::senderrawsocket(std::string recipient, std::string message)
     strcpy(source_ip_, ip_.c_str());
     sin_.sin_family = AF_INET;
     sin_.sin_port = htons(port_);
-    sin_.sin_addr.s_addr = inet_addr(DESTINATION_ADDR);
+    if (localhost_flag_)
+    {
+        sin_.sin_addr.s_addr = inet_addr(LOCALHOST_DEST_ADDR);
+    }
+    else
+    {
+        sin_.sin_addr.s_addr = inet_addr(DESTINATION_ADDR);
+    }
 
     IPheader();
     IPchecksum();
@@ -146,6 +182,11 @@ void senderrawsocket::SendTo()
     {
         std::cout << "Packet Send. Length : " << iph_->tot_len << std::endl;
     }
+}
+
+senderrawsocket::~senderrawsocket()
+{
+    close(raw_socket_);
 }
 
 }

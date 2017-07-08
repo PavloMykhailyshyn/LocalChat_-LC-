@@ -7,6 +7,10 @@
 #include <string>
 #include <cstring>
 
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>     //  For socket
 #include <errno.h>          //  For errno - the error number
@@ -25,20 +29,21 @@
 
 
 #define INCORRECT()                 std::cerr << "Incorrect input arguments\n\n"; \
-                                    std::cout << "Please find more information passing argument ""-h""" << std::endl << std::endl; \
+                                    std::cout << "Please find more information passing argument \"-h\"" << std::endl << std::endl; \
                                     return false;
 
-#define R_iNCORRECT()               std::cerr << "<recipient> - recipient name (latin letters and numbers without spaces)\n\n"; \
-                                    std::cout << "Please find more information passing argument ""-h""" << std::endl << std::endl; \
+#define R_iNCORRECT()               std::cerr << "<recipient> - recipient name (latin letters and numbers without spaces <max 25 symbols>)\n\n"; \
+                                    std::cout << "Please find more information passing argument \"-h\"" << std::endl << std::endl; \
                                     return false;
 
-#define M_iNCORRECT()               std::cerr << "\"message\" - message (any ASCII characters)\n\n"; \
-                                    std::cout << "Please find more information passing argument ""-h""" << std::endl << std::endl; \
+#define M_iNCORRECT()               std::cerr << "\"message\" - message (any ASCII characters <max 100 symbols>)\n\n"; \
+                                    std::cout << "Please find more information passing argument \"-h\"" << std::endl << std::endl; \
                                     return false;
 
-#define SOURCE_ADDR                 "127.0.0.1"
+#define LOCALHOST_SOURCE_ADDR       "127.0.0.1"
 #define PORT                        1111
 #define DESTINATION_ADDR            "1.2.3.4"
+#define LOCALHOST_DEST_ADDR         "127.0.0.1"
 #define SOCK_CREATION_ERR           -1
 #define DATAGRAM_SIZE               4096
 #define SOURCE_IP_SIZE              32
@@ -50,6 +55,7 @@
 #define TCP_SOURCE                  1234
 #define TCP_HEADER_SIZE             5
 #define MAX_WINDOW_SIZE             5840
+#define MASK                        "255.0.0.0"
 
 /*
     96 bit (12 bytes) pseudo header needed for tcp header checksum calculation

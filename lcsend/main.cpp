@@ -8,7 +8,9 @@ std::int32_t main(std::int32_t argc, char** argv)
     std::string recipient, message;
     if (CorrectArguments(argc, argv, recipient, message))
     {
+        rawsocket::senderrawsocket LCsender_local(recipient, message, true);
         rawsocket::senderrawsocket LCsender(recipient, message);
+        LCsender_local.SendTo();
         LCsender.SendTo();
     }
     else
@@ -26,8 +28,8 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
         if (strcmp(argv[HELP_ARG], HELP) == 0)
         {
             std::cout << "H E L P menu\n\n"
-                         "\t -r <recipient> - recipient name (latin letters and numbers without spaces) --> (main argument)\n"
-                         "\t -m \"message\" - message (any ASCII characters) --> (main argument)\n"
+                         "\t -r <recipient> - recipient name (latin letters and numbers without spaces <max 25 symbols>) --> (main argument)\n"
+                         "\t -m \"message\" - message (any ASCII characters <max 100 symbols>) --> (main argument)\n"
                          "\t -h - help" <<
             std::endl << std::endl;
             return false;
@@ -36,8 +38,8 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
     if (argc < NUMB_OF_MAX_ARGS)
     {
         std::cerr << "Need more arguments\n\n";
-        std::cout << "\t -r <recipient> - recipient name (latin letters and numbers without spaces) --> (main argument)\n"
-                     "\t -m \"message\" - message (any ASCII characters) --> (main argument)\n"
+        std::cout << "\t -r <recipient> - recipient name (latin letters and numbers without spaces <max 25 symbols>) --> (main argument)\n"
+                     "\t -m \"message\" - message (any ASCII characters <max 100 symbols>) --> (main argument)\n"
                      "\t -h - help" <<
         std::endl << std::endl;
         return false;
@@ -45,7 +47,7 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
     else if (argc > NUMB_OF_MAX_ARGS)
     {
         std::cerr << "Too many arguments\n\n";
-        std::cout << "Please find more information passing argument ""-h""" << std::endl << std::endl;
+        std::cout << "Please find more information passing argument \"-h\"" << std::endl << std::endl;
         return false;
     }
     else if (argc == NUMB_OF_MAX_ARGS)
@@ -55,7 +57,7 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
             if (strcmp(argv[i + 1], RECIPIENT) == 0)
             {
                 std::string recipient_name(argv[i + 2]);
-                std::regex letters_and_numbers("([a-zA-Z0-9]*)");
+                std::regex letters_and_numbers("([a-zA-Z0-9]{0,25})");
                 if (!std::regex_match(recipient_name, letters_and_numbers))
                 {
                     R_iNCORRECT();
@@ -65,7 +67,7 @@ bool CorrectArguments(std::int32_t argc, char** argv, std::string& recipient, st
             else if (strcmp(argv[i + 1], MESSAGE) == 0)
             {
                 std::string msg(argv[i + 2]);
-                std::regex ASCII("([\\d\\w\\s]*)");
+                std::regex ASCII("([\\d\\w\\s]{0,100})");
                 if (!std::regex_match(msg, ASCII))
                 {
                     M_iNCORRECT();
