@@ -6,7 +6,9 @@ const std::uint32_t senderrawsocket::port_ = PORT;
 
 senderrawsocket::senderrawsocket(std::string recipient, std::string message, bool localhost_flag) : localhost_flag_(localhost_flag)
 {
-    std::string recipient_and_message = recipient + DELIMITER + message;
+    srand((unsigned)time(NULL));
+
+    std::string recipient_and_message = std::to_string(rand()) + DELIMITER + recipient + DELIMITER + message;
 
     if (localhost_flag_)
     {
