@@ -4,41 +4,34 @@ namespace rawsocket
 
 const std::uint32_t senderrawsocket::port_ = PORT;
 
-senderrawsocket::senderrawsocket(std::string recipient, std::string message, bool localhost_flag) : localhost_flag_(localhost_flag)
+senderrawsocket::senderrawsocket(std::string recipient, std::string message)
 {
-    srand((unsigned)time(NULL));
+    std::string recipient_and_message = recipient + DELIMITER + message;
 
-    std::string recipient_and_message = std::to_string(rand()) + DELIMITER + recipient + DELIMITER + message;
 
-    if (localhost_flag_)
+    ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
+    void * tmpAddrPtr = NULL;
+
+    getifaddrs(&ifAddrStruct);
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
     {
-        ip_ = LOCALHOST_SOURCE_ADDR;
-    }
-    else
-    {
-        ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
-        void * tmpAddrPtr = NULL;
-
-        getifaddrs(&ifAddrStruct);
-        for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+        if (ifa ->ifa_addr->sa_family == AF_INET) // Check it is IPv4
         {
-            if (ifa ->ifa_addr->sa_family == AF_INET) // Check it is IPv4
+            char mask[INET_ADDRSTRLEN];
+            void* mask_ptr = &((sockaddr_in*) ifa->ifa_netmask)->sin_addr;
+            inet_ntop(AF_INET, mask_ptr, mask, INET_ADDRSTRLEN);
+            if (strcmp(mask, MASK) != 0) // Is a valid IPv4 Address
             {
-                char mask[INET_ADDRSTRLEN];
-                void* mask_ptr = &((sockaddr_in*) ifa->ifa_netmask)->sin_addr;
-                inet_ntop(AF_INET, mask_ptr, mask, INET_ADDRSTRLEN);
-                if (strcmp(mask, MASK) != 0) // Is a valid IPv4 Address
-                {
-                    tmpAddrPtr = &((sockaddr_in *) ifa->ifa_addr)->sin_addr;
-                    char addressBuffer[INET_ADDRSTRLEN];
-                    inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-                    ip_ = addressBuffer;
-                }
+                tmpAddrPtr = &((sockaddr_in *) ifa->ifa_addr)->sin_addr;
+                char addressBuffer[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+                ip_ = addressBuffer;
             }
         }
-        if (ifAddrStruct != NULL)
-            freeifaddrs(ifAddrStruct);
     }
+    if (ifAddrStruct != NULL)
+        freeifaddrs(ifAddrStruct);
+
 
     raw_socket_ = socket (PF_INET, SOCK_RAW, IPPROTO_TCP);
 
@@ -65,14 +58,7 @@ senderrawsocket::senderrawsocket(std::string recipient, std::string message, boo
     strcpy(source_ip_, ip_.c_str());
     sin_.sin_family = AF_INET;
     sin_.sin_port = htons(port_);
-    if (localhost_flag_)
-    {
-        sin_.sin_addr.s_addr = inet_addr(LOCALHOST_DEST_ADDR);
-    }
-    else
-    {
-        sin_.sin_addr.s_addr = inet_addr(DESTINATION_ADDR);
-    }
+    sin_.sin_addr.s_addr = inet_addr(DESTINATION_ADDR);
 
     IPheader();
     IPchecksum();

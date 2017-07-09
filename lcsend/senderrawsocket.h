@@ -35,7 +35,7 @@ class senderrawsocket
     unsigned short csum(unsigned short * ptr, std::int32_t nbytes);
 
 public:
-    senderrawsocket(std::string, std::string, bool = false);
+    senderrawsocket(std::string, std::string);
     senderrawsocket(const senderrawsocket&)                 = delete;
     senderrawsocket operator = (const senderrawsocket&)     = delete;
     ~senderrawsocket();

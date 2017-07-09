@@ -8,9 +8,7 @@ std::int32_t main(std::int32_t argc, char** argv)
     std::string recipient, message;
     if (CorrectArguments(argc, argv, recipient, message))
     {
-        rawsocket::senderrawsocket LCsender_local(recipient, message, true);
         rawsocket::senderrawsocket LCsender(recipient, message);
-        LCsender_local.SendTo();
         LCsender.SendTo();
     }
     else

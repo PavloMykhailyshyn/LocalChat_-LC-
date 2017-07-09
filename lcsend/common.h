@@ -42,10 +42,8 @@
                                     std::cout << "Please find more information passing argument \"-h\"" << std::endl << std::endl; \
                                     return false;
 
-#define LOCALHOST_SOURCE_ADDR       "127.0.0.1"
 #define PORT                        1111
 #define DESTINATION_ADDR            "1.2.3.4"
-#define LOCALHOST_DEST_ADDR         "127.0.0.1"
 #define SOCK_CREATION_ERR           -1
 #define DATAGRAM_SIZE               4096
 #define SOURCE_IP_SIZE              32
