@@ -47,7 +47,6 @@ if __name__ == '__main__':
     if re.match(RECIPIENT_NAME_REGEXP, str(args.recipient)) and re.match(MESSAGE_REGEXP, str(args.message)):
         recipient = str(args.recipient)
         message = str(args.message)
+        send_message(recipient, message)
     else:
         print "Please pass \"-h\" to find more info"
-
-    send_message(recipient, message)
