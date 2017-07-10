@@ -17,6 +17,7 @@ class MessagesDB:
         self.db_conn = sqlite3.connect(self.full_db_path)
         self.cursor = self.db_conn.cursor()
         self.__create_table_if_not_exist()
+	self.cursor.execute('DELETE FROM {0};'.format(TABLE_NAME))
 
     def __del__(self):
         """close db connection when finish work"""

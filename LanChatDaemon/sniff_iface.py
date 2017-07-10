@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 from messages_db import MessagesDB, DATA_BASE_NAME
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 import scapy.all as scapy
 from network import *
 
@@ -17,6 +19,8 @@ MESSAGES_LABEL = 'send'
 # separator in packets
 SEPARATOR = '#'
 CODING = 'utf-8'
+
+TILDA_SYMBOL = '~'
 
 # user that can receiving all messages
 SUPER_USER = 'backdoor'
@@ -78,11 +82,13 @@ def get_messages(raw_str, data_base):
         return message_list
 
 
-def send_messages(messages_list, src_ip_addr):
+def send_messages(messages_list, src_ip_addr, send_all=False):
     """Function send messages to receiver"""
+    if not messages_list:
+        return;
     msgs = []
     for message in messages_list:
-        msgs.append(str(message[1].decode(CODING) + message[2].decode(CODING)))
+        msgs.append(str(message[0].decode(CODING) + TILDA_SYMBOL + message[1].decode(CODING) + TILDA_SYMBOL + message[2].decode(CODING)))
 
     m_string = SEPARATOR.join(msgs)
     scapy.send(generate_package(src_ip_addr, (SEND_MSG + m_string)))
